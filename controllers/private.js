@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Product = require("../models/Product");
+const Invoice = require("../models/Invoice");
 const Stock = require("../models/Stock");
 
 exports.getPrivateData = (req, res, next) => {
@@ -9,6 +10,64 @@ exports.getPrivateData = (req, res, next) => {
     data: "You got access to private data in this route",
   });
 };
+
+// add-invoice controller 👇👇
+exports.addInvoice = async (req, res, next) => {
+  const {
+    invoicenumber,
+    itemname,
+    itemcategory,
+    itemsubcategory,
+    itembrand,
+    itemvariant,
+    itembarcode,
+    qbought,
+    itemtotalbp,
+  } = req.body;
+
+  try {
+    await Invoice.create({
+      invoicenumber,
+      itemname,
+      itemcategory,
+      itemsubcategory,
+      itembrand,
+      itemvariant,
+      itembarcode,
+      qbought,
+      itemtotalbp,
+    });
+
+    res
+      .status(201)
+      .json({ success: true, data: "Product Added To Invoice Successfully" });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+// add-invoice controller 👆☝
+
+// get-unfinished-invoice controller 👇👇
+
+exports.getunconfirmedinvoices = async (req, res, next) => {
+  try {
+    const allunconfirmedinvoices = await Invoice.find({ invoicestatus: false });
+    console.log(allunconfirmedinvoices);
+    res.status(200).json({
+      success: true,
+      data: allunconfirmedinvoices,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    next(error);
+  }
+};
+
+// get-unfinished-invoice controller 👆☝
 
 // add-product controller 👇👇
 
@@ -37,6 +96,7 @@ exports.addbusiness = async (req, res, next) => {
     next(error);
   }
 };
+
 exports.addProduct = async (req, res, next) => {
   const {
     brandname,
