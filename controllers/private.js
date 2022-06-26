@@ -48,12 +48,48 @@ exports.addInvoice = async (req, res, next) => {
 };
 // add-invoice controller 👆☝
 
+// add-products controller 👇👇
+exports.addproduct = async (req, res, next) => {
+  const {
+    invoicenumber,
+    itemname,
+    itemcategory,
+    itemsubcategory,
+    itembrand,
+    itemvariant,
+    itembarcode,
+    qbought,
+    itemtotalbp,
+  } = req.body;
+
+  try {
+    await Product.create({
+      invoicenumber,
+      itemname,
+      itemcategory,
+      itemsubcategory,
+      itembrand,
+      itemvariant,
+      itembarcode,
+      qbought,
+      itemtotalbp,
+    });
+
+    res
+      .status(201)
+      .json({ success: true, data: "Product Added To Invoice Successfully" });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+// add-products controller 👆☝
+
 // get-unfinished-invoice controller 👇👇
 
 exports.getunconfirmedinvoices = async (req, res, next) => {
   try {
     const allunconfirmedinvoices = await Invoice.find({ invoicestatus: false });
-    console.log(allunconfirmedinvoices);
     res.status(200).json({
       success: true,
       data: allunconfirmedinvoices,
@@ -68,6 +104,31 @@ exports.getunconfirmedinvoices = async (req, res, next) => {
 };
 
 // get-unfinished-invoice controller 👆☝
+
+// set-unconfirmed-invoice to true controller 👇👇
+
+exports.verifyinvoice = async (req, res, next) => {
+  const { invoiceid } = req.body;
+  try {
+    await Invoice.findByIdAndUpdate(invoiceid, {
+      invoicestatus: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: "Invoice Confirmation Success",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    next(error);
+  }
+};
+
+// set-unconfirmed-invoice to true controller 👆☝
 
 // add-product controller 👇👇
 

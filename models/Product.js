@@ -2,35 +2,48 @@ const mongoose = require("mongoose");
 
 const ProductSchema = new mongoose.Schema(
   {
-    pin: {
-      type: Number,
-      required: [true, "PIN is required"],
-    },
-    pinserial: {
-      type: Number,
-      required: [true, "PIN serial is required"],
-    },
-    provider: {
+    invoicenumber: {
       type: String,
-      required: [true, "Full name of service provider is required"],
+      required: [true, "Invoice Number is required."],
     },
-    worth: {
+    itemname: {
+      type: String,
+      required: [true, "Item Name is required."],
+    },
+    itemcategory: {
+      type: String,
+      required: [true, "Item Category is required."],
+    },
+    itemsubcategory: {
+      type: String,
+      required: [true, "Item Full Name is Required."],
+    },
+    itembrand: {
+      type: String,
+      required: [true, "Item Brand is required."],
+    },
+    itemvariant: {
+      type: String,
+      required: [true, "Item Variant is required."],
+    },
+    itembarcode: {
+      type: String,
+    },
+    qbought: {
       type: Number,
-      required: [true, "PIN Worth is required"],
+      required: [true, "Quantity Bought is required."],
     },
-    expdate: {
-      type: Date,
-      required: [true, "PIN expiry date is required"],
+    itemtotalbp: {
+      type: String,
+      required: [true, "Total Item Buying Price is required."],
+    },
+    invoicestatus: {
+      type: Boolean,
+      default: false,
     },
     status: {
       type: Boolean,
-      required: [true, "PIN status is required"],
       default: true,
-    },
-    reqby: {
-      type: String,
-      required: [true, "Full name of service provider is required"],
-      default: "-",
     },
   },
   { timestamps: true }
