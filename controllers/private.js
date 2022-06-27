@@ -108,11 +108,12 @@ exports.getunconfirmedinvoices = async (req, res, next) => {
 // set-unconfirmed-invoice to true controller 👇👇
 
 exports.verifyinvoice = async (req, res, next) => {
-  const { invoiceid } = req.body;
+  const { currentInvoiceNumber } = req.body;
   try {
-    await Invoice.findByIdAndUpdate(invoiceid, {
-      invoicestatus: true,
-    });
+    await Invoice.updateMany(
+      { invoicenumber: currentInvoiceNumber },
+      { $set: { invoicestatus: true } }
+    );
 
     res.status(200).json({
       success: true,
