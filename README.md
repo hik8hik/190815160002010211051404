@@ -73,6 +73,6 @@ You can start by running the following commands in the cloned project folder:
 >
 > Hope it ran for you successfuly.
 
-[![Success Run](/assets/images/general/run_success.png "Run Success, Vs Code by Hik Hik")](https://www.hik8hik.github.io)
+[![Success Run](https://github.com/hik8hik/hik8hik/blob/main/assets\images\general\github_snake.svg "Run Success, Vs Code by Hik Hik")](https://www.hik8hik.github.io)
 
 You can find a video tutorial [here](https://youtube.com), or a video explanation on how to get the cloned repo running [here](https://youtube.com).
