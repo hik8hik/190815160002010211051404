@@ -7,7 +7,8 @@ This is a simple backend solution for nodejs using express and axios and can be 
 > I know you **`cloned`** or **`forked`** me,
 >
 > > I saved you **`coding`** time. Give me **`the repo`** a start as appreciation.
-> > Hope you are done showing the project some appreciation, now it is time for me to help you get started quickly.
+>
+> Hope you are done showing the project some appreciation, now it is time for me to help you get started quickly.
 
 ## Getting Started
 
