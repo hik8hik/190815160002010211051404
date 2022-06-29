@@ -16,8 +16,8 @@ This is a simple backend solution for nodejs using express and axios and can be 
 
 You can start by running the following commands in the cloned project folder:
 
-> 1. Depending on the package management tool you use, either **`yarn`** or **`npm`**.
->    Start by either running the commands
+> Depending on the package management tool you use, either **`yarn`** or **`npm`**.
+> Start by either running the commands
 >
 > For yarn, run: 👇
 >
@@ -31,10 +31,14 @@ You can start by running the following commands in the cloned project folder:
 > > npm install
 > > ```
 >
-> 2. Now lets create a env file to hold our environment secrets.
+> Now lets create a env file to hold our environment secrets.
 >
-> > Go to the project root and add a file named cnfig.env
+> > Still under the project's root folder, run the following command.
 > > Inside it add the following:
+> >
+> > ```bash
+> > yarn
+> > ```
 
 ```bash
 yarn
