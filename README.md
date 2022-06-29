@@ -15,7 +15,7 @@ If you use npm:
 
 ```bash
 #!/bin/bash
-npm install
+echo npm install
 
 ```
 
