@@ -17,21 +17,18 @@ You can start by running the following commands in the cloned project folder:
 >
 > For yarn, run: 👇
 >
-> > `yarn`
+> > ```bash
+> > yarn
+> > ```
 >
 > For npm, run: 👇
 >
-> > `npm install`
->
-> Now lets create a env file to hold our environment secrets.
+> > ```bash
+> > npm install
+> > ```
+> >
+> > Now lets create a env file to hold our environment secrets.
 
 ```bash
 yarn
-```
-
-If you use npm:
-
-```bash
- npm install
-
 ```
