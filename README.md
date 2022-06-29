@@ -2,13 +2,28 @@
 
 This is a simple backend solution for nodejs using express and axios and can be implemented to use Mongodb Database or firebase...
 
+## Just a _by the way_
+
 > I know you **`cloned`** or **`forked`** me,
 >
 > > I saved you **`coding`** time. Give me **`the repo`** a start as appreciation.
 
+## How to run me
+
 You can start by running the following commands in the cloned project folder:
 
-If you use yarn:
+> Depending on the package management tool you use, either **`yarn`** or **`npm`**.
+> Start by either running the commands
+>
+> For yarn, run: 👇
+>
+> > `yarn`
+>
+> For npm, run: 👇
+>
+> > `npm install`
+>
+> Now lets create a env file to hold our environment secrets.
 
 ```bash
 yarn
