@@ -37,15 +37,24 @@ You can start by running the following commands in the cloned project folder:
 > > Inside it add the following:
 > >
 > > ```bash
-> > yarn
+> > mkdir config.env
 > > ```
 > >
-> > Done? Now lets open the file and paste in the following:
+> > Done? Now lets open the file in your text editor and paste in the following (Remember to change respective secrets as text coded.):
 > >
 > > ```env
-> > yarn
+> > PORT=5000
+> > MONGO_URI=mongodb://localhost:27017/...{the mongo db url, both online or local}
+> >
+> > JWT_SECRET={your JWT Secret}
+> > JWT_EXPIRE=20min
+> >
+> > EMAIL_SERVICE=SendGrid
+> > EMAIL_USERNAME={username as provide by Sendgrid}
+> > EMAIL_PASSWORD={password as provided by Sendgrid}
+> > EMAIL_FROM={email as provide by sendgrid}
 > > ```
-
-```bash
-yarn
-```
+> >
+> > The file now has all the required secrets.
+>
+> Done, and it is time to run it!
