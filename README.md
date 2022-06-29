@@ -39,6 +39,12 @@ You can start by running the following commands in the cloned project folder:
 > > ```bash
 > > yarn
 > > ```
+> >
+> > Done? Now lets open the file and paste in the following:
+> >
+> > ```env
+> > yarn
+> > ```
 
 ```bash
 yarn
