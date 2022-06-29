@@ -6,13 +6,15 @@ You can start by running:
 
 If you use yarn:
 
-```javascript
+```bash
+#!/bin/bash
 yarn;
 ```
 
 If you use npm:
 
-```javascript
+```bash
+#!/bin/bash
 npm install
 
 ```
