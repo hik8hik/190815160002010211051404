@@ -26,8 +26,11 @@ You can start by running the following commands in the cloned project folder:
 > > ```bash
 > > npm install
 > > ```
-> >
-> > Now lets create a env file to hold our environment secrets.
+>
+> Now lets create a env file to hold our environment secrets.
+>
+> > Go to the project root and add a file named cnfig.env
+> > Inside it add the following:
 
 ```bash
 yarn
