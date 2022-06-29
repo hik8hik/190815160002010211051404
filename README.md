@@ -6,12 +6,17 @@ You can start by running:
 
 If you use yarn:
 
-yarn
+```javascript
+yarn;
+```
 
 If you use npm:
 
+```javascript
 npm install
 
-> I know you **cloned** or **forked** me,
+```
+
+> I know you **`cloned`** or **`forked`** me,
 >
-> > I saved you **coding** time. Give me **the repo** a start as appreciation.
+> > I saved you **`coding`** time. Give me **`the repo`** a start as appreciation.
