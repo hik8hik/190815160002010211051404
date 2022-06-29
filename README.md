@@ -57,4 +57,20 @@ You can start by running the following commands in the cloned project folder:
 > >
 > > The file now has all the required secrets.
 >
-> Done, and it is time to run it!
+> Done, and it is time to run it! Again depending with the package manager that you are using.
+>
+> For yarn, run: 👇
+>
+> > ```bash
+> > yarn run server
+> > ```
+>
+> For npm, run: 👇
+>
+> > ```bash
+> > npm run server
+> > ```
+>
+> Hope it ran for you successfuly.
+
+You can find a video tutorial [here](https://youtube.com), or a video explanation on how to get the cloned repo running [here](https://youtube.com).
