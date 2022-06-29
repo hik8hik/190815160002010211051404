@@ -5,6 +5,7 @@ const {
   getPrivateData,
   addInvoice,
   verifyinvoice,
+  deleteinvoiceitem,
   getunconfirmedinvoices,
   addbusiness,
   getuserbusinesses,
@@ -22,6 +23,7 @@ router.route("/").get(protect, getPrivateData);
 router.route("/createinvoice").post(protect, addInvoice);
 router.route("/createbusiness").post(protect, addbusiness);
 router.route("/confirminvoice").post(protect, verifyinvoice);
+router.route("/deleteinvoiceitem").post(protect, deleteinvoiceitem);
 router.route("/getincompleteinvoices").get(protect, getunconfirmedinvoices);
 router.route("/getuserbusinesses").get(protect, getuserbusinesses);
 router.route("/addproduct").post(protect, addproduct);

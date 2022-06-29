@@ -131,6 +131,29 @@ exports.verifyinvoice = async (req, res, next) => {
 
 // set-unconfirmed-invoice to true controller 👆☝
 
+// delete-invoice-items controller 👇👇
+
+exports.deleteinvoiceitem = async (req, res, next) => {
+  const { itemid } = req.body;
+  try {
+    await Invoice.deleteOne({ _id: itemid });
+
+    res.status(200).json({
+      success: true,
+      data: "Invoice Item Deleted",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    next(error);
+  }
+};
+
+// delete-invoice-items controller 👆☝
+
 // add-product controller 👇👇
 
 exports.addbusiness = async (req, res, next) => {
