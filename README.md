@@ -73,6 +73,10 @@ You can start by running the following commands in the cloned project folder:
 >
 > Hope it ran for you successfuly.
 
+### On success run
+
+The terminal should resemble this image.
+
 [![Success Run](/readme/assets/images/general/run_success.png "Run Success, Vs Code by Hik Hik")](https://hik8hik.github.io)
 
 You can find a video tutorial [here](https://youtube.com), or a video explanation on how to get the cloned repo running [here](https://youtube.com).
