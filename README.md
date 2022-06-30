@@ -1,6 +1,8 @@
 # 190815160002010211051404
 
-## Me
+Find summarised content by clicking a button at the top left of this read me.
+
+## Intro
 
 This is a simple backend solution in nodejs using express and axios and can be implemented to use Mongodb Database or firebase...
 
