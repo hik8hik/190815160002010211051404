@@ -1,8 +1,14 @@
 # 190815160002010211051404
 
-This is a simple backend solution for nodejs using express and axios and can be implemented to use Mongodb Database or firebase...
+## Me
 
-## Just a _by the way_
+This is a simple backend solution in nodejs using express and axios and can be implemented to use Mongodb Database or firebase...
+
+## Understand why I am public
+
+You can suggest changes, submit PRs or even clone me as a learning step. Trust me, I will save you time, 😉.
+
+## Just a '_by the way_'
 
 > I know you **`cloned`** or **`forked`** me,
 >
@@ -77,6 +83,12 @@ You can start by running the following commands in the cloned project folder:
 
 The terminal should resemble this image.
 
+## Help?
+
 [![Success Run](/readme/assets/images/general/run_success.png "Run Success, Vs Code by Hik Hik")](https://hik8hik.github.io)
 
 You can find a video tutorial [here](https://youtube.com), or a video explanation on how to get the cloned repo running [here](https://youtube.com).
+
+## Current Contributors
+
+[`Hik HIk`](https://github.com/hik8hik).
