@@ -23,7 +23,10 @@ exports.addInvoice = async (req, res, next) => {
     itembarcode,
     qbought,
     itemtotalbp,
+    singleitemsp,
   } = req.body;
+
+  let singleitembp = itemtotalbp / qbought;
 
   try {
     await Invoice.create({
@@ -36,6 +39,8 @@ exports.addInvoice = async (req, res, next) => {
       itembarcode,
       qbought,
       itemtotalbp,
+      singleitembp,
+      singleitemsp,
     });
 
     res
@@ -119,6 +124,32 @@ exports.verifyinvoice = async (req, res, next) => {
       success: true,
       data: "Invoice Confirmation Success",
     });
+
+    try {
+      const currentInvoiceItems = await Invoice.find({
+        invoicenumber: currentInvoiceNumber,
+      });
+
+      currentInvoiceItems.forEach(async (element) => {
+        await Product.create({
+          invoicenumber: element.invoicenumber,
+          itemname: element.itemname,
+          itemcategory: element.itemcategory,
+          itemsubcategory: element.itemsubcategory,
+          itembrand: element.itembrand,
+          itemvariant: element.itemvariant,
+          itembarcode: element.itembarcode,
+          qbought: element.qbought,
+          singleitembp: element.singleitembp,
+          singleitemsp: element.singleitemsp,
+          itemalloweddiscount: element.qbought,
+        });
+      });
+
+      console.log(currentInvoiceItems);
+    } catch (err) {
+      console.log(err.message);
+    }
   } catch (error) {
     console.log(error);
     res.status(404).json({

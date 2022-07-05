@@ -33,13 +33,17 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Quantity Bought is required."],
     },
-    itemtotalbp: {
-      type: String,
+    singleitembp: {
+      type: Number,
       required: [true, "Total Item Buying Price is required."],
     },
-    invoicestatus: {
-      type: Boolean,
-      default: false,
+    singleitemsp: {
+      type: Number,
+      required: [true, "Total Item Buying Price is required."],
+    },
+    itemalloweddiscount: {
+      type: Number,
+      required: [true, "Total Item Buying Price is required."],
     },
     status: {
       type: Boolean,

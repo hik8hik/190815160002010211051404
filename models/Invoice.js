@@ -37,6 +37,14 @@ const InvoiceSchema = new mongoose.Schema(
       type: String,
       required: [true, "Total Item Buying Price is required."],
     },
+    singleitembp: {
+      type: String,
+      required: [true, "Auto Buying Price Missing."],
+    },
+    singleitemsp: {
+      type: String,
+      required: [true, "Auto Selling Price Missing."],
+    },
     invoicestatus: {
       type: Boolean,
       default: false,
