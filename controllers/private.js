@@ -110,7 +110,7 @@ exports.getunconfirmedinvoices = async (req, res, next) => {
 
 // get-unfinished-invoice controller 👆☝
 
-// set-unconfirmed-invoice to true controller 👇👇
+// set-unconfirmed-invoice to true controller (also add products from invoice to product doc) 👇👇
 
 exports.verifyinvoice = async (req, res, next) => {
   const { currentInvoiceNumber } = req.body;
@@ -160,7 +160,7 @@ exports.verifyinvoice = async (req, res, next) => {
   }
 };
 
-// set-unconfirmed-invoice to true controller 👆☝
+// set-unconfirmed-invoice to true controller (also add products from invoice to product doc) 👆☝
 
 // delete-invoice-items controller 👇👇
 
