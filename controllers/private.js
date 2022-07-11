@@ -349,28 +349,6 @@ exports.getProduct = async (req, res, next) => {
 
 // get all products controller 👇👇
 exports.getSumProfitPerProduct = async (req, res, next) => {
-  console.log("I am hit");
-  /* Stock.aggregate(
-    [
-      {
-        $group: {
-          _id: "$brandtype",
-          total: {
-            $sum: "$profit",
-          },
-        },
-      },
-    ],
-    function (err, result) {
-      if (err) {
-        res.send(err);
-        console.log(err);
-      } else {
-        res.json(result);
-      }
-    }
-  ); */
-
   try {
     allmatch = await Stock.aggregate([
       { $match: { brandname: "Safari" } },

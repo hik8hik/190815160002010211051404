@@ -49,6 +49,9 @@ const ProductSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    itemdescription: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
