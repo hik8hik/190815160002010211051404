@@ -372,7 +372,6 @@ exports.getSumProfitPerProduct = async (req, res, next) => {
 
 // get all products controller 👇👇
 exports.stocksProfitwid = async (req, res, next) => {
-  console.log("I am hit");
   try {
     const now = new Date();
 
