@@ -12,6 +12,8 @@ const {
   addproduct,
   getStocks,
   getProducts,
+  addToCart,
+  getCartProducts,
   getProduct,
   addStock,
   getSumProfitPerProduct,
@@ -30,6 +32,8 @@ router.route("/addproduct").post(protect, addproduct);
 router.route("/addstock").post(protect, addStock);
 router.route("/getallstocks").get(protect, getStocks);
 router.route("/getallproducts").get(protect, getProducts);
+router.route("/additemtocart").post(protect, addToCart);
+router.route("/getorders").get(protect, getCartProducts);
 router.route("/getproductwid/:id").get(protect, getProduct);
 router.route("/gbbtprofit").get(protect, getSumProfitPerProduct);
 router.route("/stocksprofit").get(protect, stocksProfit);

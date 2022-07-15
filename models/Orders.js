@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const OrdersSchema = new mongoose.Schema(
   {
+    itemid: {
+      type: String,
+      required: [true, "Id required."],
+    },
     ordertype: {
       type: String,
       default: "direct",
@@ -33,15 +37,7 @@ const OrdersSchema = new mongoose.Schema(
     itembarcode: {
       type: String,
     },
-    qbought: {
-      type: Number,
-      required: [true, "Quantity Bought is required."],
-    },
-    singleitembp: {
-      type: Number,
-      required: [true, "Total Item Buying Price is required."],
-    },
-    singleitemsp: {
+    sp: {
       type: Number,
       required: [true, "Total Item Buying Price is required."],
     },

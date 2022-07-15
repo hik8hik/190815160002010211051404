@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Product = require("../models/Product");
+const Orders = require("../models/Orders");
 const Invoice = require("../models/Invoice");
 const Stock = require("../models/Stock");
 
@@ -318,6 +319,8 @@ exports.getuserbusinesses = async (req, res, next) => {
   }
 };
 
+// get all products controller 👇👇
+
 exports.getProducts = async (req, res, next) => {
   try {
     const allproducts = await Product.find({});
@@ -335,6 +338,65 @@ exports.getProducts = async (req, res, next) => {
 };
 
 // get all products controller 👆☝
+
+// add item to cart controller 👇👇
+
+exports.addToCart = async (req, res, next) => {
+  const { itemid } = req.body;
+  try {
+    const item = await Product.find({ _id: itemid });
+    try {
+      item.forEach(async (e) => {
+        await Orders.create({
+          itemid: e._id,
+          invoicenumber: e.invoicenumber,
+          itemname: e.itemname,
+          itemcategory: e.itemcategory,
+          itemsubcategory: e.itemsubcategory,
+          itembrand: e.itembrand,
+          itemvariant: e.itemvariant,
+          itembarcode: e.itembarcode,
+          sp: e.singleitemsp,
+          itemalloweddiscount: e.itemalloweddiscount,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    }
+    res.status(200).json({
+      success: true,
+      data: item,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    next(error);
+  }
+};
+
+// add item to cart controller 👆☝
+
+// get all cart_products controller 👇👇
+
+exports.getCartProducts = async (req, res, next) => {
+  try {
+    const allproducts = await Orders.find({});
+    res.status(200).json({
+      success: true,
+      data: allproducts,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    next(error);
+  }
+};
+
+// get all cart_products controller 👆☝
 
 // get onee product with id
 exports.getProduct = async (req, res, next) => {
