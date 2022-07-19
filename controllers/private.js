@@ -96,18 +96,16 @@ exports.addproduct = async (req, res, next) => {
 
 // get-unfinished-invoice controller 👇👇
 
-const onetimeFunction = () => {
-
+const onetimeFunction = async () => {
   await Invoice.updateMany(
     { invoicestatus: true },
     { $set: { invoicestatus: false } }
   );
-
-}
+};
 
 exports.getunconfirmedinvoices = async (req, res, next) => {
   try {
-    onetimeFunction()
+    onetimeFunction();
     const allunconfirmedinvoices = await Invoice.find({ invoicestatus: false });
     res.status(200).json({
       success: true,
