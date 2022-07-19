@@ -23,11 +23,13 @@ exports.addInvoice = async (req, res, next) => {
     itemvariant,
     itembarcode,
     qbought,
-    itemtotalbp,
+    singleitembp,
+    totalitemsdiscount,
     singleitemsp,
   } = req.body;
 
-  let singleitembp = itemtotalbp / qbought;
+  // Already minused discount in frontend
+  let itemtotalbp = singleitembp * qbought;
 
   try {
     await Invoice.create({
@@ -39,8 +41,9 @@ exports.addInvoice = async (req, res, next) => {
       itemvariant,
       itembarcode,
       qbought,
-      itemtotalbp,
       singleitembp,
+      totalitemsdiscount,
+      itemtotalbp,
       singleitemsp,
     });
 

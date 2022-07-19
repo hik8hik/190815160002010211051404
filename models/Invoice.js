@@ -33,13 +33,17 @@ const InvoiceSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Quantity Bought is required."],
     },
-    itemtotalbp: {
-      type: String,
-      required: [true, "Total Item Buying Price is required."],
-    },
     singleitembp: {
       type: String,
       required: [true, "Auto Buying Price Missing."],
+    },
+    totalitemsdiscount: {
+      type: String,
+      required: [true, "Auto Buying Price Missing."],
+    },
+    itemtotalbp: {
+      type: String,
+      required: [true, "Total Item Buying Price is required."],
     },
     singleitemsp: {
       type: String,
