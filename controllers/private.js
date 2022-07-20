@@ -401,6 +401,56 @@ exports.getCartProducts = async (req, res, next) => {
 
 // get all cart_products controller 👆☝
 
+// remove one item from cart controller 👇👇
+
+exports.removeFromCart = async (req, res, next) => {
+  const { itemid } = req.body;
+  try {
+    try {
+      await Orders.deleteOne({ itemid: itemid });
+    } catch (err) {
+      console.log(err);
+    }
+    res.status(200).json({
+      success: true,
+      data: "Item Removed",
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    next(error);
+  }
+};
+
+// remove one item from cart controller 👆☝
+
+// remove item group from cart controller 👇👇
+
+exports.removeGroupFromCart = async (req, res, next) => {
+  const { itemid } = req.body;
+  try {
+    try {
+      await Orders.deleteMany({ itemid: itemid });
+    } catch (err) {
+      console.log(err);
+    }
+    res.status(200).json({
+      success: true,
+      data: "Item Removed",
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    next(error);
+  }
+};
+
+// remove item group from cart controller 👆☝
+
 // get onee product with id
 exports.getProduct = async (req, res, next) => {
   const id = req.params.id;
