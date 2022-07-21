@@ -3,6 +3,7 @@ const User = require("../models/User");
 const Product = require("../models/Product");
 const Orders = require("../models/Orders");
 const Invoice = require("../models/Invoice");
+const Invoicereport = require("../models/Invoicereport");
 const Stock = require("../models/Stock");
 
 exports.getPrivateData = (req, res, next) => {
@@ -117,7 +118,12 @@ exports.getunconfirmedinvoices = async (req, res, next) => {
 // set-unconfirmed-invoice to true controller (also add products from invoice to product doc) 👇👇
 
 exports.verifyinvoice = async (req, res, next) => {
-  const { currentInvoiceNumber } = req.body;
+  const {
+    currentInvoiceNumber,
+    invoiceTotal,
+    noIncompleteInvoices,
+    invoiceTotalDiscount,
+  } = req.body;
   try {
     await Invoice.updateMany(
       { invoicenumber: currentInvoiceNumber },
@@ -129,11 +135,46 @@ exports.verifyinvoice = async (req, res, next) => {
       data: "Invoice Confirmation Success",
     });
 
-    try {
-      const currentInvoiceItems = await Invoice.find({
-        invoicenumber: currentInvoiceNumber,
-      });
+    const currentInvoiceItems = await Invoice.find({
+      invoicenumber: currentInvoiceNumber,
+    });
 
+    // Creating Invoice Snapshot From Invoice Items
+    try {
+      await Invoicereport.create({
+        invoicenumber: currentInvoiceNumber,
+        noitems: noIncompleteInvoices,
+        totaldiscount: invoiceTotalDiscount,
+        total: invoiceTotal,
+      });
+      currentInvoiceItems.forEach(async (element) => {
+        await Invoicereport.findOneAndUpdate(
+          { invoicenumber: currentInvoiceNumber },
+          {
+            $push: {
+              items: {
+                invoicenumber: element.invoicenumber,
+                itemname: element.itemname,
+                itemcategory: element.itemcategory,
+                itemsubcategory: element.itemsubcategory,
+                itembrand: element.itembrand,
+                itemvariant: element.itemvariant,
+                itembarcode: element.itembarcode,
+                qbought: element.qbought,
+                singleitembp: element.singleitembp,
+                singleitemsp: element.singleitemsp,
+                itemalloweddiscount: element.qbought,
+              },
+            },
+          }
+        );
+      });
+    } catch (errInvoiceSnap) {
+      console.log(errInvoiceSnap.message);
+    }
+    // Creating Products From Invoice Items
+
+    try {
       currentInvoiceItems.forEach(async (element) => {
         await Product.create({
           invoicenumber: element.invoicenumber,
