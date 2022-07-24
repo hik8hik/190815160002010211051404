@@ -147,6 +147,7 @@ exports.verifyinvoice = async (req, res, next) => {
         totaldiscount: invoiceTotalDiscount,
         total: invoiceTotal,
       });
+
       currentInvoiceItems.forEach(async (element) => {
         await Invoicereport.findOneAndUpdate(
           { invoicenumber: currentInvoiceNumber },
@@ -192,9 +193,10 @@ exports.verifyinvoice = async (req, res, next) => {
       });
 
       console.log(currentInvoiceItems);
-    } catch (err) {
-      console.log(err.message);
+    } catch (errInvoiceSnapForeach) {
+      console.log(errInvoiceSnapForeach.message);
     }
+    
   } catch (error) {
     console.log(error);
     res.status(404).json({
