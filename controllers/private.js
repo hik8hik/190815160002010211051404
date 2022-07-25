@@ -4,6 +4,7 @@ const Product = require("../models/Product");
 const Orders = require("../models/Orders");
 const Invoice = require("../models/Invoice");
 const Invoicereport = require("../models/Invoicereport");
+const Ticket = require("../models/Ticket");
 const Stock = require("../models/Stock");
 
 exports.getPrivateData = (req, res, next) => {
