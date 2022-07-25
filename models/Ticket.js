@@ -57,7 +57,7 @@ const TicketSchema = new mongoose.Schema(
   {
     ticketnumber: {
       type: String,
-      required: [true, "Invoice Number is required."],
+      default: "",
     },
     noitems: {
       type: Number,
@@ -88,6 +88,6 @@ const TicketSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Ticket= mongoose.model("Ticket", TicketSchema);
+const Ticket = mongoose.model("Ticket", TicketSchema);
 
 module.exports = Ticket;
