@@ -196,7 +196,6 @@ exports.verifyinvoice = async (req, res, next) => {
     } catch (errInvoiceSnapForeach) {
       console.log(errInvoiceSnapForeach.message);
     }
-    
   } catch (error) {
     console.log(error);
     res.status(404).json({
@@ -208,6 +207,102 @@ exports.verifyinvoice = async (req, res, next) => {
 };
 
 // set-unconfirmed-invoice to true controller (also add products from invoice to product doc) 👆☝
+
+// Complete Sale for a ticket(Also subtract quantyty sold, items from cart, and save  a sale snapshot) 👇👇
+
+exports.completesale = async (req, res, next) => {
+  const {
+    currentInvoiceNumber,
+    invoiceTotal,
+    noIncompleteInvoices,
+    invoiceTotalDiscount,
+  } = req.body;
+
+  const ticketnumber = "";
+
+  try {
+    await Invoice.updateMany(
+      { invoicenumber: currentInvoiceNumber },
+      { $set: { invoicestatus: true } }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: "Invoice Confirmation Success",
+    });
+
+    const currentInvoiceItems = await Invoice.find({
+      invoicenumber: currentInvoiceNumber,
+    });
+
+    // Creating Invoice Snapshot From Invoice Items
+    try {
+      await Invoicereport.create({
+        invoicenumber: currentInvoiceNumber,
+        noitems: noIncompleteInvoices,
+        totaldiscount: invoiceTotalDiscount,
+        total: invoiceTotal,
+      });
+
+      currentInvoiceItems.forEach(async (element) => {
+        await Invoicereport.findOneAndUpdate(
+          { invoicenumber: currentInvoiceNumber },
+          {
+            $push: {
+              items: {
+                invoicenumber: element.invoicenumber,
+                itemname: element.itemname,
+                itemcategory: element.itemcategory,
+                itemsubcategory: element.itemsubcategory,
+                itembrand: element.itembrand,
+                itemvariant: element.itemvariant,
+                itembarcode: element.itembarcode,
+                qbought: element.qbought,
+                singleitembp: element.singleitembp,
+                singleitemsp: element.singleitemsp,
+                itemalloweddiscount: element.qbought,
+              },
+            },
+          }
+        );
+      });
+    } catch (errInvoiceSnap) {
+      console.log(errInvoiceSnap.message);
+    }
+    // Creating Products From Invoice Items
+
+    try {
+      currentInvoiceItems.forEach(async (element) => {
+        await Product.create({
+          invoicenumber: element.invoicenumber,
+          itemname: element.itemname,
+          itemcategory: element.itemcategory,
+          itemsubcategory: element.itemsubcategory,
+          itembrand: element.itembrand,
+          itemvariant: element.itemvariant,
+          itembarcode: element.itembarcode,
+          qbought: element.qbought,
+          singleitembp: element.singleitembp,
+          singleitemsp: element.singleitemsp,
+          itemalloweddiscount: element.qbought,
+        });
+      });
+
+      console.log(currentInvoiceItems);
+    } catch (errInvoiceSnapForeach) {
+      console.log(errInvoiceSnapForeach.message);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    next(error);
+  }
+};
+
+// Complete Sale for a ticket(Also subtract quantyty sold, items from cart, and save  a sale snapshot) 👆☝
 
 // delete-invoice-items controller 👇👇
 
