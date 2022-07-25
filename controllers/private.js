@@ -212,43 +212,40 @@ exports.verifyinvoice = async (req, res, next) => {
 // Complete Sale for a ticket(Also subtract quantyty sold, items from cart, and save  a sale snapshot) 👇👇
 
 exports.completesale = async (req, res, next) => {
-  const {
-    currentInvoiceNumber,
-    invoiceTotal,
-    noIncompleteInvoices,
-    invoiceTotalDiscount,
-  } = req.body;
+  const { cartTotal, noCartProducts, ticketDiscount } = req.body;
+  const currTicketItems = await Orders.find({ status: true });
 
-  const ticketnumber = "";
-
+  // Create the ticket
   try {
-    await Invoice.updateMany(
-      { invoicenumber: currentInvoiceNumber },
-      { $set: { invoicestatus: true } }
-    );
-
-    res.status(200).json({
-      success: true,
-      data: "Invoice Confirmation Success",
+    await Ticket.create({
+      noitems: noCartProducts,
+      totaldiscount: ticketDiscount,
+      total: cartTotal,
     });
 
-    const currentInvoiceItems = await Invoice.find({
-      invoicenumber: currentInvoiceNumber,
-    });
-
-    // Creating Invoice Snapshot From Invoice Items
+    //Update Stock
     try {
-      await Invoicereport.create({
-        invoicenumber: currentInvoiceNumber,
-        noitems: noIncompleteInvoices,
-        totaldiscount: invoiceTotalDiscount,
-        total: invoiceTotal,
-      });
-
-      currentInvoiceItems.forEach(async (element) => {
-        await Invoicereport.findOneAndUpdate(
-          { invoicenumber: currentInvoiceNumber },
+      currTicketItems.forEach(async (element) => {
+        await Product.findOneAndUpdate(
+          { _id: element.itemid },
           {
+            $inc: {
+              qbought: -1,
+            },
+          }
+        );
+      });
+    } catch (errorUpdateStockQuantty) {
+      console.log(errorUpdateStockQuantty.message);
+    }
+
+    // Push Current Ticket Items To The Ticket Snapshot created
+    try {
+      currTicketItems.forEach(async (element) => {
+        await Ticket.findOneAndUpdate(
+          { status: true },
+          {
+            status: false,
             $push: {
               items: {
                 invoicenumber: element.invoicenumber,
@@ -260,46 +257,36 @@ exports.completesale = async (req, res, next) => {
                 itembarcode: element.itembarcode,
                 qbought: element.qbought,
                 singleitembp: element.singleitembp,
-                singleitemsp: element.singleitemsp,
+                singleitemsp: element.sp,
                 itemalloweddiscount: element.qbought,
               },
             },
           }
         );
       });
-    } catch (errInvoiceSnap) {
-      console.log(errInvoiceSnap.message);
+    } catch (errorAddingTicketItems) {
+      next(errorAddingTicketItems);
     }
-    // Creating Products From Invoice Items
 
+    // Clear Cart
     try {
-      currentInvoiceItems.forEach(async (element) => {
-        await Product.create({
-          invoicenumber: element.invoicenumber,
-          itemname: element.itemname,
-          itemcategory: element.itemcategory,
-          itemsubcategory: element.itemsubcategory,
-          itembrand: element.itembrand,
-          itemvariant: element.itemvariant,
-          itembarcode: element.itembarcode,
-          qbought: element.qbought,
-          singleitembp: element.singleitembp,
-          singleitemsp: element.singleitemsp,
-          itemalloweddiscount: element.qbought,
-        });
+      currTicketItems.forEach(async (element) => {
+        await Orders.findOneAndUpdate({ status: true }, { status: false });
       });
-
-      console.log(currentInvoiceItems);
-    } catch (errInvoiceSnapForeach) {
-      console.log(errInvoiceSnapForeach.message);
+    } catch (errorClearCart) {
+      next(errorClearCart);
     }
-  } catch (error) {
-    console.log(error);
+
+    res.status(200).json({
+      success: true,
+      data: "Ticket Charge Success",
+    });
+  } catch (errorCreateTicket) {
     res.status(404).json({
       success: false,
-      data: error,
+      data: errorCreateTicket,
     });
-    next(error);
+    console.log(errorCreateTicket.message);
   }
 };
 
@@ -523,8 +510,9 @@ exports.addToCart = async (req, res, next) => {
 // get all cart_products controller 👇👇
 
 exports.getCartProducts = async (req, res, next) => {
+  // Status = True = Current Item
   try {
-    const allproducts = await Orders.find({});
+    const allproducts = await Orders.find({ status: true });
     res.status(200).json({
       success: true,
       data: allproducts,
