@@ -5,6 +5,7 @@ const Orders = require("../models/Orders");
 const Invoice = require("../models/Invoice");
 const Invoicereport = require("../models/Invoicereport");
 const Ticket = require("../models/Ticket");
+const Tn = require("../models/Tn");
 const Stock = require("../models/Stock");
 
 exports.getPrivateData = (req, res, next) => {
@@ -214,10 +215,52 @@ exports.verifyinvoice = async (req, res, next) => {
 exports.completesale = async (req, res, next) => {
   const { cartTotal, noCartProducts, ticketDiscount } = req.body;
   const currTicketItems = await Orders.find({ status: true });
+  const initialTicketNumber = await Tn.find({});
+
+  // Creating or update TN
+  try {
+    const digityear = new Date().getFullYear();
+    const digitmonth = new Date().getMonth() + 1;
+    const digitday = new Date().getDate();
+    const tnDefault =
+      digityear * 100000000 + digitmonth * 1000000 + digitday * 10000;
+
+    if (initialTicketNumber.length <= 0) {
+      //Create the ticket number
+      try {
+        await Tn.create({
+          tn: tnDefault,
+        });
+      } catch (errorCreateTn) {
+        console.log(errorCreateTn);
+      }
+    } else {
+      //Update TN By Inc it by 1
+      try {
+        await Tn.findOneAndUpdate(
+          {},
+          {
+            $inc: {
+              tn: 1,
+            },
+          }
+        );
+      } catch (errorUpdateTn) {
+        console.log(errorUpdateTn);
+      }
+    }
+    console.log(initialTicketNumber.length);
+    console.log("TN complete");
+  } catch (errorCorUTicket) {
+    console.log(errorCorUTicket);
+  }
 
   // Create the ticket
   try {
+    const currTn = await Tn.findOne({});
+    console.log(currTn.tn);
     await Ticket.create({
+      ticketnumber: currTn.tn,
       noitems: noCartProducts,
       totaldiscount: ticketDiscount,
       total: cartTotal,

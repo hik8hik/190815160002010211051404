@@ -57,7 +57,6 @@ const TicketSchema = new mongoose.Schema(
   {
     ticketnumber: {
       type: String,
-      default: "",
     },
     noitems: {
       type: Number,
