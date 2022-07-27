@@ -320,9 +320,12 @@ exports.completesale = async (req, res, next) => {
       next(errorClearCart);
     }
 
+    console.log(`Initial TN = ${initialTicketNumber[0].tn}`);
+
     res.status(200).json({
       success: true,
       data: "Ticket Charge Success",
+      tn: initialTicketNumber.length <= 0 ? 1 : initialTicketNumber[0].tn + 1,
     });
   } catch (errorCreateTicket) {
     res.status(404).json({
