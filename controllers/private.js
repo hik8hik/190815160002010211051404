@@ -322,10 +322,13 @@ exports.completesale = async (req, res, next) => {
 
     console.log(`Initial TN = ${initialTicketNumber[0].tn}`);
 
+    //Get Ticket and send it
+    const createdTicket = await Ticket.findOne({ ticketnumber: currTn.tn });
+
     res.status(200).json({
       success: true,
       data: "Ticket Charge Success",
-      tn: initialTicketNumber.length <= 0 ? 1 : initialTicketNumber[0].tn + 1,
+      ticket: createdTicket,
     });
   } catch (errorCreateTicket) {
     res.status(404).json({
