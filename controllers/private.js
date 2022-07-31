@@ -288,7 +288,6 @@ exports.completesale = async (req, res, next) => {
         await Ticket.findOneAndUpdate(
           { status: true },
           {
-            status: false,
             $push: {
               items: {
                 invoicenumber: element.invoicenumber,
@@ -307,8 +306,11 @@ exports.completesale = async (req, res, next) => {
           }
         );
       });
+
+      // set ticket to false
+      await Ticket.findOneAndUpdate({ status: true }, { status: false });
     } catch (errorAddingTicketItems) {
-      next(errorAddingTicketItems);
+      console.log(errorAddingTicketItems);
     }
 
     // Clear Cart
@@ -322,8 +324,9 @@ exports.completesale = async (req, res, next) => {
 
     console.log(`Initial TN = ${initialTicketNumber[0].tn}`);
 
-    //Get Ticket and send it
+    // Get Ticket and send it
     const createdTicket = await Ticket.findOne({ ticketnumber: currTn.tn });
+    console.log(`created ticket = ${createdTicket}`);
 
     res.status(200).json({
       success: true,
