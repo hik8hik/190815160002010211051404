@@ -31,7 +31,7 @@ exports.addInvoice = async (req, res, next) => {
     singleitemsp,
   } = req.body;
 
-  // Already minused discount in frontend
+  // Already subtracted discount in frontend
   let itemtotalbp = singleitembp * qbought;
 
   try {
