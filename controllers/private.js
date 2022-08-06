@@ -322,8 +322,6 @@ exports.completesale = async (req, res, next) => {
       next(errorClearCart);
     }
 
-    console.log(`Initial TN = ${initialTicketNumber[0].tn}`);
-
     // Get Ticket and send it
     const createdTicket = await Ticket.findOne({ ticketnumber: currTn.tn });
     console.log(`created ticket = ${createdTicket}`);
