@@ -217,6 +217,134 @@ exports.completesale = async (req, res, next) => {
   const currTicketItems = await Orders.find({ status: true });
   const initialTicketNumber = await Tn.find({});
 
+  //////////////////////////////////
+
+  // Get Ticket and send it
+  const sendTicket = async () => {
+    console.log("Sending Ticket");
+    const currTn = await Tn.findOne({});
+    try {
+      const createdTicket = await Ticket.findOne({ ticketnumber: currTn.tn });
+      console.log(`created ticket = ${createdTicket}`);
+
+      res.status(200).json({
+        success: true,
+        data: "Ticket Charge Success",
+        ticket: createdTicket,
+      });
+      console.log("Done sending Ticket");
+    } catch (errorSendingTicketBack) {
+      console.log(errorSendingTicketBack);
+    }
+  };
+
+  // set ticket to false
+  const signOutTicket = async () => {
+    console.log("Signing Ticket");
+    await Ticket.findOneAndUpdate({ status: true }, { status: false });
+    console.log("Done signing Ticket");
+    console.log("Calling funct to send ticket");
+    sendTicket();
+  };
+
+  // Clear Cart
+  const clearCart = async () => {
+    console.log("Start clear cart");
+    try {
+      currTicketItems.forEach(async (element) => {
+        await Orders.findOneAndUpdate({ status: true }, { status: false });
+      });
+      console.log("End clear cart");
+      console.log("Call sign ticket");
+      signOutTicket();
+    } catch (errorClearCart) {
+      next(errorClearCart);
+    }
+  };
+
+  //Update Stock
+  const stockUpdate = async () => {
+    console.log("Start stock update");
+    try {
+      currTicketItems.forEach(async (element) => {
+        await Product.findOneAndUpdate(
+          { _id: element.itemid },
+          {
+            $inc: {
+              qbought: -1,
+            },
+          }
+        );
+      });
+      console.log("Done stock updating");
+      console.log("Calling funct to clear cart");
+      clearCart();
+    } catch (errorUpdateStockQuantty) {
+      console.log(errorUpdateStockQuantty.message);
+    }
+  };
+
+  // Push Current Ticket Items To The Ticket Snapshot created
+  const pushToTicketSnap = async () => {
+    console.log("Start pushing to Ticket");
+    try {
+      currTicketItems.forEach(async (element) => {
+        await Ticket.findOneAndUpdate(
+          { status: true },
+          {
+            $push: {
+              items: {
+                invoicenumber: element.invoicenumber,
+                itemname: element.itemname,
+                itemcategory: element.itemcategory,
+                itemsubcategory: element.itemsubcategory,
+                itembrand: element.itembrand,
+                itemvariant: element.itemvariant,
+                itembarcode: element.itembarcode,
+                qbought: element.qbought,
+                singleitembp: element.singleitembp,
+                singleitemsp: element.sp,
+                itemalloweddiscount: element.qbought,
+              },
+            },
+          }
+        );
+      });
+
+      console.log("Done pushing to ticket");
+      console.log("Calling funct to update stock");
+      stockUpdate();
+    } catch (errorAddingTicketItems) {
+      console.log(errorAddingTicketItems);
+    }
+  };
+
+  // Create the ticket
+  const createTicket = async () => {
+    try {
+      console.log("Start Ticket create");
+      const currTn = await Tn.findOne({});
+      console.log(currTn.tn);
+      await Ticket.create({
+        ticketnumber: currTn.tn,
+        noitems: noCartProducts,
+        totaldiscount: ticketDiscount,
+        total: cartTotal,
+      });
+      console.log("Done Ticket create");
+      console.log("Calling funct to push items to ticket");
+      pushToTicketSnap();
+    } catch (errorCreateTicket) {
+      res.status(404).json({
+        success: false,
+        data: errorCreateTicket,
+      });
+      console.log(errorCreateTicket.message);
+    }
+  };
+
+  //////////////////////////////////
+
   // Creating or update TN
   try {
     const digityear = new Date().getFullYear();
@@ -251,92 +379,9 @@ exports.completesale = async (req, res, next) => {
     }
     console.log(initialTicketNumber.length);
     console.log("TN complete");
+    createTicket();
   } catch (errorCorUTicket) {
     console.log(errorCorUTicket);
-  }
-
-  // Create the ticket
-  try {
-    const currTn = await Tn.findOne({});
-    console.log(currTn.tn);
-    await Ticket.create({
-      ticketnumber: currTn.tn,
-      noitems: noCartProducts,
-      totaldiscount: ticketDiscount,
-      total: cartTotal,
-    });
-
-    //Update Stock
-    try {
-      currTicketItems.forEach(async (element) => {
-        await Product.findOneAndUpdate(
-          { _id: element.itemid },
-          {
-            $inc: {
-              qbought: -1,
-            },
-          }
-        );
-      });
-    } catch (errorUpdateStockQuantty) {
-      console.log(errorUpdateStockQuantty.message);
-    }
-
-    // Push Current Ticket Items To The Ticket Snapshot created
-    try {
-      currTicketItems.forEach(async (element) => {
-        await Ticket.findOneAndUpdate(
-          { status: true },
-          {
-            $push: {
-              items: {
-                invoicenumber: element.invoicenumber,
-                itemname: element.itemname,
-                itemcategory: element.itemcategory,
-                itemsubcategory: element.itemsubcategory,
-                itembrand: element.itembrand,
-                itemvariant: element.itemvariant,
-                itembarcode: element.itembarcode,
-                qbought: element.qbought,
-                singleitembp: element.singleitembp,
-                singleitemsp: element.sp,
-                itemalloweddiscount: element.qbought,
-              },
-            },
-          }
-        );
-      });
-
-      // set ticket to false
-      await Ticket.findOneAndUpdate({ status: true }, { status: false });
-    } catch (errorAddingTicketItems) {
-      console.log(errorAddingTicketItems);
-    }
-
-    // Clear Cart
-    try {
-      currTicketItems.forEach(async (element) => {
-        await Orders.findOneAndUpdate({ status: true }, { status: false });
-      });
-    } catch (errorClearCart) {
-      next(errorClearCart);
-    }
-
-    // Get Ticket and send it
-    const createdTicket = await Ticket.findOne({ ticketnumber: currTn.tn });
-    console.log(`created ticket = ${createdTicket}`);
-
-    res.status(200).json({
-      success: true,
-      data: "Ticket Charge Success",
-      ticket: createdTicket,
-    });
-  } catch (errorCreateTicket) {
-    res.status(404).json({
-      success: false,
-      data: errorCreateTicket,
-    });
-    console.log(errorCreateTicket.message);
   }
 };
 
