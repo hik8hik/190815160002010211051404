@@ -14,6 +14,7 @@ const {
   getProducts,
   addToCart,
   completesale,
+  getalltickets,
   removeFromCart,
   removeGroupFromCart,
   getCartProducts,
@@ -37,6 +38,7 @@ router.route("/getallstocks").get(protect, getStocks);
 router.route("/getallproducts").get(protect, getProducts);
 router.route("/additemtocart").post(protect, addToCart);
 router.route("/chargecart").post(protect, completesale);
+router.route("/allsales").post(protect, getalltickets);
 router.route("/removeonefromcart").post(protect, removeFromCart);
 router.route("/removegroupfromcart").post(protect, removeGroupFromCart);
 router.route("/getorders").get(protect, getCartProducts);

@@ -342,6 +342,26 @@ exports.completesale = async (req, res, next) => {
 
 // Complete Sale for a ticket(Also subtract quantyty sold, items from cart, and save  a sale snapshot) 👆☝
 
+// Get All Tickets 👇👇
+
+exports.getalltickets = async (req, res, next) => {
+  try {
+    const allTickets = await Ticket.find({});
+    res.status(200).json({
+      success: true,
+      data: allTickets,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    next(error);
+  }
+};
+
+// Get All Tickets 👆☝
+
 // delete-invoice-items controller 👇👇
 
 exports.deleteinvoiceitem = async (req, res, next) => {
