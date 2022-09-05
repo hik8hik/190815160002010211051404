@@ -15,13 +15,24 @@ const {
   addToCart,
   completesale,
   getalltickets,
+  sendRequestedTicket,
+  sendRequestedInvoicereport,
+  getInvoiceReports,
+  getTickets,
+  getFiveLatestTickets,
+  getFiveLatestInvoices,
   removeFromCart,
   removeGroupFromCart,
   getCartProducts,
   getProduct,
   addStock,
   getSumProfitPerProduct,
-  stocksProfit,
+  invoiceReportsTotals,
+  ticketTotals,
+  ticketTotalsThisYear,
+  invoiceTotalsThisYear,
+  likebookbTotalsThisYear,
+  coverImageUpload,
 } = require("../controllers/private");
 const { protect } = require("../middleware/auth");
 
@@ -39,11 +50,30 @@ router.route("/getallproducts").get(protect, getProducts);
 router.route("/additemtocart").post(protect, addToCart);
 router.route("/chargecart").post(protect, completesale);
 router.route("/allsales").post(protect, getalltickets);
+router.route("/getticketticketnumber").post(protect, sendRequestedTicket);
+router
+  .route("/getinvoiceinvoicenumber")
+  .post(protect, sendRequestedInvoicereport);
+router.route("/getinvoicereports").get(protect, getInvoiceReports);
+router.route("/gettickets").get(protect, getTickets);
+router.route("/getfivelatesttickets").get(protect, getFiveLatestTickets);
+router.route("/getfivelatestinvoices").get(protect, getFiveLatestInvoices);
 router.route("/removeonefromcart").post(protect, removeFromCart);
 router.route("/removegroupfromcart").post(protect, removeGroupFromCart);
 router.route("/getorders").get(protect, getCartProducts);
 router.route("/getproductwid/:id").get(protect, getProduct);
 router.route("/gbbtprofit").get(protect, getSumProfitPerProduct);
-router.route("/stocksprofit").get(protect, stocksProfit);
+router.route("/getaccumulatedinvoicetotals").get(protect, invoiceReportsTotals);
+router.route("/getaccumulatedtickettotals").get(protect, ticketTotals);
+router
+  .route("/getaccumulatedtickettotalsthisyear")
+  .get(protect, ticketTotalsThisYear);
+router
+  .route("/getaccumulatedinvoicetotalsthisyear")
+  .get(protect, invoiceTotalsThisYear);
+router
+  .route("/getaccumulatedlikebooktotalsthisyear")
+  .post(protect, likebookbTotalsThisYear);
+router.route("/uploaditemcoverimage").post(protect, coverImageUpload);
 
 module.exports = router;

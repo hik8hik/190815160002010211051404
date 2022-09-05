@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 const items = new mongoose.Schema(
   {
+    invoicecompany: {
+      type: String,
+    },
     invoicenumber: {
       type: String,
       required: [true, "Invoice Number is required."],

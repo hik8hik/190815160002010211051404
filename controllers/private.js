@@ -1,4 +1,13 @@
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+const express = require("express");
+
+const assert = require("assert");
+const mongodb = require("mongodb");
+
 const User = require("../models/User");
 const Product = require("../models/Product");
 const Orders = require("../models/Orders");
@@ -7,6 +16,12 @@ const Invoicereport = require("../models/Invoicereport");
 const Ticket = require("../models/Ticket");
 const Tn = require("../models/Tn");
 const Stock = require("../models/Stock");
+const Covers = require("../models/Covers");
+const Errors = require("../models/Errors");
+
+// constants global varialbles
+const thisYear = new Date().getFullYear();
+const lastYear = thisYear - 1;
 
 exports.getPrivateData = (req, res, next) => {
   res.status(200).json({
@@ -19,6 +34,7 @@ exports.getPrivateData = (req, res, next) => {
 exports.addInvoice = async (req, res, next) => {
   const {
     invoicenumber,
+    invoicecompany,
     itemname,
     itemcategory,
     itemsubcategory,
@@ -29,7 +45,10 @@ exports.addInvoice = async (req, res, next) => {
     singleitembp,
     totalitemsdiscount,
     singleitemsp,
+    itemcover,
   } = req.body;
+
+  console.log(itemcover);
 
   // Already subtracted discount in frontend
   let itemtotalbp = singleitembp * qbought;
@@ -37,6 +56,7 @@ exports.addInvoice = async (req, res, next) => {
   try {
     await Invoice.create({
       invoicenumber,
+      invoicecompany,
       itemname,
       itemcategory,
       itemsubcategory,
@@ -64,6 +84,7 @@ exports.addInvoice = async (req, res, next) => {
 exports.addproduct = async (req, res, next) => {
   const {
     invoicenumber,
+    invoicecompany,
     itemname,
     itemcategory,
     itemsubcategory,
@@ -77,6 +98,7 @@ exports.addproduct = async (req, res, next) => {
   try {
     await Product.create({
       invoicenumber,
+      invoicecompany,
       itemname,
       itemcategory,
       itemsubcategory,
@@ -122,6 +144,7 @@ exports.getunconfirmedinvoices = async (req, res, next) => {
 exports.verifyinvoice = async (req, res, next) => {
   const {
     currentInvoiceNumber,
+    currentInvoiceCompany,
     invoiceTotal,
     noIncompleteInvoices,
     invoiceTotalDiscount,
@@ -145,6 +168,7 @@ exports.verifyinvoice = async (req, res, next) => {
     try {
       await Invoicereport.create({
         invoicenumber: currentInvoiceNumber,
+        invoicecompany: currentInvoiceCompany,
         noitems: noIncompleteInvoices,
         totaldiscount: invoiceTotalDiscount,
         total: invoiceTotal,
@@ -157,6 +181,7 @@ exports.verifyinvoice = async (req, res, next) => {
             $push: {
               items: {
                 invoicenumber: element.invoicenumber,
+                invoicecompany: element.invoicecompany,
                 itemname: element.itemname,
                 itemcategory: element.itemcategory,
                 itemsubcategory: element.itemsubcategory,
@@ -181,6 +206,7 @@ exports.verifyinvoice = async (req, res, next) => {
       currentInvoiceItems.forEach(async (element) => {
         await Product.create({
           invoicenumber: element.invoicenumber,
+          invoicecompany: element.invoicecompany,
           itemname: element.itemname,
           itemcategory: element.itemcategory,
           itemsubcategory: element.itemsubcategory,
@@ -295,6 +321,7 @@ exports.completesale = async (req, res, next) => {
             $push: {
               items: {
                 invoicenumber: element.invoicenumber,
+                invoicecompany: element.invoicecompany,
                 itemname: element.itemname,
                 itemcategory: element.itemcategory,
                 itemsubcategory: element.itemsubcategory,
@@ -387,6 +414,58 @@ exports.completesale = async (req, res, next) => {
 
 // Complete Sale for a ticket(Also subtract quantyty sold, items from cart, and save  a sale snapshot) 👆☝
 
+// Get Send Req Tickets 👇👇
+
+exports.sendRequestedTicket = async (req, res, next) => {
+  const { ticketnumber } = req.body;
+  console.log("Sending Ticket");
+
+  try {
+    const requestedTicket = await Ticket.findOne({
+      ticketnumber: ticketnumber,
+    });
+    console.log(`Sent ticket = ${requestedTicket}`);
+
+    res.status(200).json({
+      success: true,
+      data: "Ticket Request Success",
+      ticket: requestedTicket,
+    });
+
+    console.log("Done sending Ticket");
+  } catch (errorSendingTicketBack) {
+    console.log(errorSendingTicketBack);
+  }
+};
+
+// Get Send Req Tickets 👆☝
+
+// Get Send Req Invoices Report 👇👇
+
+exports.sendRequestedInvoicereport = async (req, res, next) => {
+  const { invoicenumber } = req.body;
+  console.log("Sending Invoice");
+
+  try {
+    const requestedInvoice = await Invoicereport.findOne({
+      invoicenumber: invoicenumber,
+    });
+    console.log(`Sent Invoice = ${requestedInvoice}`);
+
+    res.status(200).json({
+      success: true,
+      data: "Invoice Request Success",
+      ticket: requestedInvoice,
+    });
+
+    console.log("Done sending Ticket");
+  } catch (errorSendingTicketBack) {
+    console.log(errorSendingTicketBack);
+  }
+};
+
+// Get Send Req Invoices Report 👆☝
+
 // Get All Tickets 👇👇
 
 exports.getalltickets = async (req, res, next) => {
@@ -429,6 +508,78 @@ exports.deleteinvoiceitem = async (req, res, next) => {
 };
 
 // delete-invoice-items controller 👆☝
+
+// Get Invoice Reports and send 👇👇
+
+exports.getInvoiceReports = async (req, res, next) => {
+  console.log("Sending Invoice");
+
+  try {
+    const invoiceReports = await Invoicereport.find({});
+
+    res.status(200).json({ success: true, data: invoiceReports });
+    console.log("Done sending Invoice");
+  } catch (errorSendingInvoiceReports) {
+    console.log(errorSendingInvoiceReports);
+    next(errorSendingInvoiceReports);
+  }
+};
+
+// Get Invoice Reports and send 👆☝
+
+// Get Tickets and send 👇👇
+
+exports.getTickets = async (req, res, next) => {
+  console.log("Sending Ticket");
+
+  try {
+    const tickets = await Ticket.find({});
+
+    res.status(200).json({ success: true, data: tickets });
+    console.log("Done sending Ticket");
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+// Get Tickets and send 👆☝
+
+// Get 5 Latest Tickets and send 👇👇
+
+exports.getFiveLatestTickets = async (req, res, next) => {
+  console.log("Sending Tickets");
+
+  try {
+    const tickets = await Ticket.find({}).sort({ _id: -1 }).limit(5);
+
+    res.status(200).json({ success: true, data: tickets });
+    console.log("Done sending Ticket");
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+// Get 5 Latest Invoice and send 👆☝
+
+// Get 5 Latest Tickets and send 👇👇
+
+exports.getFiveLatestInvoices = async (req, res, next) => {
+  console.log("Sending Invoices");
+
+  try {
+    const invoices = await Invoicereport.find({}).sort({ _id: -1 }).limit(5);
+
+    res.status(200).json({ success: true, data: invoices });
+    console.log("Done sending Invoices");
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
+// Get 5 Latest Invoice and send 👆☝
 
 // add-product controller 👇👇
 
@@ -771,19 +922,11 @@ exports.stocksProfitwid = async (req, res, next) => {
 
 // get all products controller 👆☝
 
-// get all products controller 👇👇
-exports.stocksProfit = async (req, res, next) => {
+// Get Accumulated Invoice Totals 👇👇
+
+exports.invoiceReportsTotals = async (req, res, next) => {
   try {
-    const now = new Date();
-
-    const year = now.getFullYear();
-    const month = now.getMonth();
-    const date = now.getDate();
-
-    const start = new Date(year, month, 1);
-    const end = new Date(year, month, 30);
-
-    const sum = await Stock.aggregate([
+    const sum = await Invoicereport.aggregate([
       {
         $match: {
           $and: [{}],
@@ -793,12 +936,14 @@ exports.stocksProfit = async (req, res, next) => {
         $group: {
           _id: null,
           total: {
-            $sum: "$profit",
+            $sum: "$total",
           },
         },
       },
     ]);
+
     console.log(sum);
+
     res.status(200).json({
       success: true,
       data: sum,
@@ -813,4 +958,363 @@ exports.stocksProfit = async (req, res, next) => {
   }
 };
 
-// get all products controller 👆☝
+// Get Accumulated Invoice Totals👆☝
+
+// Get Accumulated Sales/Tickets Totals 👇👇
+
+exports.ticketTotals = async (req, res, next) => {
+  try {
+    const sum = await Ticket.aggregate([
+      {
+        $match: {
+          $and: [{}],
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: {
+            $sum: "$total",
+          },
+        },
+      },
+    ]);
+
+    console.log(sum);
+
+    res.status(200).json({
+      success: true,
+      data: sum,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    console.log(error);
+    next(error);
+  }
+};
+
+// Get Accumulated Sales/Tickets Totals👆☝
+
+// Get Accumulated Sales/Tickets Totals  This Year👇👇
+
+exports.ticketTotalsThisYear = async (req, res, next) => {
+  const startingdate = new Date(thisYear, 00, 01, 00, 00, 00, 1);
+  const endingdate = new Date(thisYear, 11, 31, 00, 00, 00, 1);
+
+  try {
+    const sum = await Ticket.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              createdAt: {
+                $gte: startingdate,
+              },
+            },
+            {
+              createdAt: {
+                $lte: endingdate,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              date: "$createdAt",
+              format: "%Y-%m",
+            },
+          },
+          Count: {
+            $sum: "$total",
+          },
+        },
+      },
+    ]);
+    console.log(sum);
+
+    res.status(200).json({
+      success: true,
+      data: sum,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    console.log(error);
+    next(error);
+  }
+};
+
+// Get Accumulated Sales/Tickets Totals This Year👆☝
+
+// Get Accumulated Purchases/InvoiceReport Totals  This Year👇👇
+
+exports.invoiceTotalsThisYear = async (req, res, next) => {
+  const startingdate = new Date(thisYear, 00, 01, 00, 00, 00, 1);
+  const endingdate = new Date(thisYear, 11, 31, 00, 00, 00, 1);
+
+  try {
+    const sum = await Invoicereport.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              createdAt: {
+                $gte: startingdate,
+              },
+            },
+            {
+              createdAt: {
+                $lte: endingdate,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              date: "$createdAt",
+              format: "%Y-%m",
+            },
+          },
+          Count: {
+            $sum: "$total",
+          },
+        },
+      },
+    ]);
+    console.log(sum);
+
+    res.status(200).json({
+      success: true,
+      data: sum,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    console.log(error);
+    next(error);
+  }
+};
+
+// Get Accumulated Purchases/InvoiceReport Totals This Year👆☝
+
+// Get Accumulated {Itemname = like book} Totals  This Year👇👇
+
+exports.likebookbTotalsThisYear = async (req, res, next) => {
+  const startingdate = new Date(thisYear, 00, 01, 00, 00, 00, 1);
+  const endingdate = new Date(thisYear, 11, 31, 00, 00, 00, 1);
+  const { category } = req.body;
+
+  try {
+    const sum = await Orders.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              createdAt: {
+                $gte: startingdate,
+              },
+            },
+            {
+              createdAt: {
+                $lte: endingdate,
+              },
+            },
+            {
+              itemcategory: {
+                $regex: category,
+                $options: "i",
+              },
+            },
+            {
+              status: false,
+            },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              date: "$createdAt",
+              format: "%Y-%m",
+            },
+          },
+          Count: {
+            $sum: "$sp",
+          },
+        },
+      },
+    ]);
+    console.log(sum);
+
+    res.status(200).json({
+      success: true,
+      data: sum,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    console.log(error);
+    next(error);
+  }
+};
+
+/* likebookbTotalsThisYear = async (req, res, next) => {
+  const startingdate = new Date(thisYear, 00, 01, 00, 00, 00, 1);
+  const endingdate = new Date(thisYear, 11, 31, 00, 00, 00, 1);
+  const nameQuery = "book";
+
+  try {
+    const sum = await Orders.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              createdAt: {
+                $gte: startingdate,
+              },
+            },
+            {
+              createdAt: {
+                $lte: endingdate,
+              },
+            },
+            {
+              itemcategory: {
+                $regex: nameQuery,
+                $options: "i",
+              },
+            },
+            {
+              status: false,
+            },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              date: "$createdAt",
+              format: "%Y-%m",
+            },
+          },
+          Count: {
+            $sum: "$sp",
+          },
+        },
+      },
+    ]);
+    console.log(sum);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+likebookbTotalsThisYear(); */
+
+// Get Accumulated {Itemname = like book} Totals This Year👆☝
+
+exports.coverImageUpload = async (req, res, next) => {
+  const uri = process.env.MONGO_URI_NODB_NAME;
+  const dbName = "shop_dev";
+  const DIR = "./uploads";
+
+  console.log("Image Upload Started");
+  try {
+    await Errors.create({
+      errortype: "need data",
+      errormsg: `${req.body}`,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    mongodb.MongoClient.connect(uri, (error, client) => {
+      assert.ifError(error);
+
+      const db = client.db(dbName);
+
+      let bucket = new mongodb.GridFSBucket(db);
+
+      //////// FILE FROM FRONTEND SAVE
+      try {
+        // define storage
+        const storage = multer.diskStorage({
+          destination: "./public/uploads/",
+          filename: function (req, file, cb) {
+            cb(null, "IMAGE-" + Date.now() + path.extname(file.originalname));
+          },
+        });
+
+        // define upload methodF
+        const upload = multer({
+          storage: storage,
+          limits: { fileSize: 1000000 },
+        }).single("file");
+
+        // save image
+        const router = express.Router();
+
+        console.log(Date.now());
+
+        upload(req, res, (err) => {
+          console.log("Request ---", req.body);
+          console.log("Request file ---", req.file); //Here you get file.
+          /*Now do where ever you want to do*/
+        });
+        console.log(Date.now());
+      } catch (error) {
+        console.log(error);
+      }
+      //////// FILE FROM FRONTEND SAVE
+
+      fs.createReadStream("./meistersinger.mp3")
+        .pipe(bucket.openUploadStream("meistersinger.mp3"))
+        .on("error", function (error) {
+          assert.ifError(error);
+        })
+        .on("finish", function () {
+          console.log("done!");
+        });
+
+      bucket
+        .openDownloadStreamByName("meistersinger.mp3")
+        .pipe(fs.createWriteStream("./output.mp3"))
+        .on("error", function (error) {
+          assert.ifError(error);
+        })
+        .on("finish", function () {
+          console.log("done!");
+        });
+    });
+
+    console.log("Image Upload Ended");
+    res.status(200).json({
+      success: true,
+      data: "Image Received",
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+  }
+};
