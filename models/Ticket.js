@@ -82,6 +82,12 @@ const TicketSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    createdby: {
+      type: String,
+    },
+    billedby: {
+      type: String,
+    },
     deleted: {
       type: Boolean,
       default: false,

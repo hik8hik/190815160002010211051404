@@ -49,6 +49,15 @@ const OrdersSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    deleted: {
+      type: Boolean,
+    },
+    addedby: {
+      type: String,
+    },
+    removedby: {
+      type: String,
+    },
     itemdescription: {
       type: String,
     },

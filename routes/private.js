@@ -23,6 +23,7 @@ const {
   getFiveLatestInvoices,
   removeFromCart,
   removeGroupFromCart,
+  removeAllActiveGroupFromCart,
   getCartProducts,
   getProduct,
   addStock,
@@ -60,6 +61,9 @@ router.route("/getfivelatesttickets").get(protect, getFiveLatestTickets);
 router.route("/getfivelatestinvoices").get(protect, getFiveLatestInvoices);
 router.route("/removeonefromcart").post(protect, removeFromCart);
 router.route("/removegroupfromcart").post(protect, removeGroupFromCart);
+router
+  .route("/removeallactivegroupfromcart")
+  .post(protect, removeAllActiveGroupFromCart);
 router.route("/getorders").get(protect, getCartProducts);
 router.route("/getproductwid/:id").get(protect, getProduct);
 router.route("/gbbtprofit").get(protect, getSumProfitPerProduct);

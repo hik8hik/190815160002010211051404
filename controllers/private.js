@@ -243,6 +243,9 @@ exports.completesale = async (req, res, next) => {
   const currTicketItems = await Orders.find({ status: true });
   const initialTicketNumber = await Tn.find({});
 
+  let token = req.headers.authorization.split(" ")[1];
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
   //////////////////////////////////
 
   // Get Ticket and send it
@@ -267,7 +270,10 @@ exports.completesale = async (req, res, next) => {
   // set ticket to false
   const signOutTicket = async () => {
     console.log("Signing Ticket");
-    await Ticket.findOneAndUpdate({ status: true }, { status: false });
+    await Ticket.findOneAndUpdate(
+      { status: true },
+      { status: false, billedby: decoded.id }
+    );
     console.log("Done signing Ticket");
     console.log("Calling funct to send ticket");
     sendTicket();
@@ -276,9 +282,15 @@ exports.completesale = async (req, res, next) => {
   // Clear Cart
   const clearCart = async () => {
     console.log("Start clear cart");
+
+    let token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     try {
       currTicketItems.forEach(async (element) => {
-        await Orders.findOneAndUpdate({ status: true }, { status: false });
+        await Orders.findOneAndUpdate(
+          { status: true },
+          { status: false, removedby: decoded.id }
+        );
       });
       console.log("End clear cart");
       console.log("Call sign ticket");
@@ -356,7 +368,8 @@ exports.completesale = async (req, res, next) => {
         ticketnumber: currTn.tn,
         noitems: noCartProducts,
         totaldiscount: ticketDiscount,
-        total: cartTotal,
+        total: cartTotal - ticketDiscount,
+        createdby: decoded.id,
       });
       console.log("Done Ticket create");
       console.log("Calling funct to push items to ticket");
@@ -738,6 +751,9 @@ exports.getProducts = async (req, res, next) => {
 
 exports.addToCart = async (req, res, next) => {
   const { itemid } = req.body;
+
+  let token = req.headers.authorization.split(" ")[1];
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
   try {
     const item = await Product.find({ _id: itemid });
     try {
@@ -753,6 +769,7 @@ exports.addToCart = async (req, res, next) => {
           itembarcode: e.itembarcode,
           sp: e.singleitemsp,
           itemalloweddiscount: e.itemalloweddiscount,
+          addedby: decoded.id,
         });
       });
     } catch (err) {
@@ -798,9 +815,16 @@ exports.getCartProducts = async (req, res, next) => {
 
 exports.removeFromCart = async (req, res, next) => {
   const { itemid } = req.body;
+
+  let token = req.headers.authorization.split(" ")[1];
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
   try {
     try {
-      await Orders.deleteOne({ itemid: itemid });
+      await Orders.updateOne(
+        { itemid: itemid, status: true },
+        { status: false, deleted: true, removedby: decoded.id }
+      );
     } catch (err) {
       console.log(err);
     }
@@ -823,9 +847,16 @@ exports.removeFromCart = async (req, res, next) => {
 
 exports.removeGroupFromCart = async (req, res, next) => {
   const { itemid } = req.body;
+
+  let token = req.headers.authorization.split(" ")[1];
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
   try {
     try {
-      await Orders.deleteMany({ itemid: itemid });
+      await Orders.updateMany(
+        { itemid: itemid, status: true },
+        { status: false, deleted: true, removedby: decoded.id }
+      );
     } catch (err) {
       console.log(err);
     }
@@ -843,6 +874,36 @@ exports.removeGroupFromCart = async (req, res, next) => {
 };
 
 // remove item group from cart controller 👆☝
+
+// Clear Cart (Remove All Active Items) 👇👇
+
+exports.removeAllActiveGroupFromCart = async (req, res, next) => {
+  let token = req.headers.authorization.split(" ")[1];
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+  try {
+    try {
+      await Orders.updateMany(
+        { status: true },
+        { status: false, deleted: true, removedby: decoded.id }
+      );
+    } catch (err) {
+      console.log(err);
+    }
+    res.status(200).json({
+      success: true,
+      data: "Item Removed",
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      data: error,
+    });
+    next(error);
+  }
+};
+
+// Clear Cart (Remove All Active Items) 👆☝
 
 // get onee product with id
 exports.getProduct = async (req, res, next) => {
